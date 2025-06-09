@@ -98,13 +98,16 @@ impl Default for Config {
 fn default_opts(parallelism: u8) -> rocksdb::Options {
     let mut block_opts = rocksdb::BlockBasedOptions::default();
     block_opts.set_checksum_type(rocksdb::ChecksumType::CRC32c);
+    // Limit block cache to reduce memory and file handle pressure
+    let cache = rocksdb::Cache::new_lru_cache(256 << 20).expect("failed to create cache"); // 256MB cache
+    block_opts.set_block_cache(&cache);
 
     let mut opts = rocksdb::Options::default();
     opts.increase_parallelism(parallelism.into());
     opts.set_max_subcompactions(parallelism.into());
 
     opts.set_keep_log_file_num(10);
-    opts.set_max_open_files(16);
+    opts.set_max_open_files(5000); // Conservative limit for client query safety
     opts.set_compaction_style(rocksdb::DBCompactionStyle::Level);
     opts.set_compression_type(rocksdb::DBCompressionType::Zstd);
     opts.set_target_file_size_base(256 << 20);
@@ -267,6 +270,8 @@ impl DBStore {
     ) -> impl Iterator<Item = SerializedHashPrefixRow> + '_ {
         let mut opts = rocksdb::ReadOptions::default();
         opts.set_prefix_same_as_start(true); // requires .set_prefix_extractor() above.
+        opts.fill_cache(false); // Don't fill block cache for iteration to reduce memory pressure
+        opts.set_background_purge_on_iterator_cleanup(true); // Clean up resources promptly
         self.iter_cf(cf, opts, Some(prefix))
     }
 
