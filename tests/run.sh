@@ -6,7 +6,7 @@ mkdir -p data/{bitcoin,electrum,electrs}
 
 cleanup() {
   trap - SIGTERM SIGINT
-  set +eo pipefail
+  set +e +o pipefail
   jobs
   for j in `jobs -rp`
   do
@@ -15,6 +15,15 @@ cleanup() {
   done
 }
 trap cleanup SIGINT SIGTERM EXIT
+
+wait_for() {
+  CMD=$1
+  shift
+  TEST_ARGS=$*
+  for _ in `seq 0 9`; do
+    test "$($CMD | jq -c .)" $TEST_ARGS && break || sleep 2
+  done
+}
 
 BTC="bitcoin-cli -regtest -datadir=data/bitcoin"
 ELECTRUM="electrum --regtest"
@@ -60,7 +69,7 @@ $EL load_wallet
 echo "Running integration tests:"
 
 echo " * getbalance"
-test "`$EL getbalance | jq -c .`" == '{"confirmed":"550","unmatured":"4950"}'
+wait_for "$EL getbalance" == '{"confirmed":"550","unmatured":"4950"}'
 
 echo " * getunusedaddress"
 NEW_ADDR=`$EL getunusedaddress`
@@ -69,7 +78,7 @@ echo " * payto & broadcast"
 TXID=$($EL broadcast $($EL payto $NEW_ADDR 123 --fee 0.001 --password=''))
 
 echo " * get_tx_status"
-test "`$EL get_tx_status $TXID | jq -c .`" == '{"confirmations":0}'
+wait_for "$EL get_tx_status $TXID" == '{"confirmations":0}'
 
 echo " * getaddresshistory"
 test "`$EL getaddresshistory $NEW_ADDR | jq -c .`" == "[{\"fee\":100000,\"height\":0,\"tx_hash\":\"$TXID\"}]"

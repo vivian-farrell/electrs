@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 
+use bitcoin::consensus::encode::serialize_hex;
 use bitcoin::{consensus::deserialize, hashes::hex::FromHex};
 use bitcoin::{Amount, BlockHash, Transaction, Txid};
 use bitcoincore_rpc::{json, jsonrpc, Auth, Client, RpcApi};
@@ -80,7 +81,7 @@ fn read_cookie(path: &Path) -> Result<(String, String)> {
 
 fn rpc_connect(config: &Config) -> Result<Client> {
     let rpc_url = format!("http://{}", config.daemon_rpc_addr);
-    // Allow `wait_for_new_block` to take a bit longer before timing out.
+    // Allow RPC calls to take longer before timing out.
     // See https://github.com/romanz/electrs/issues/495 for more details.
     let builder = jsonrpc::simple_http::SimpleHttpTransport::builder()
         .url(&rpc_url)?
@@ -139,10 +140,9 @@ impl Daemon {
         }
 
         let p2p = Mutex::new(Connection::connect(
-            config.network,
             config.daemon_p2p_addr,
             metrics,
-            config.signet_magic,
+            config.magic,
         )?);
         Ok(Self { p2p, rpc })
     }
@@ -171,6 +171,13 @@ impl Daemon {
         self.rpc
             .send_raw_transaction(tx)
             .context("failed to broadcast transaction")
+    }
+
+    pub(crate) fn submitpackage(&self, txs: &[Transaction]) -> Result<Value> {
+        let package: Vec<String> = txs.iter().map(serialize_hex).collect();
+        self.rpc
+            .call("submitpackage", &[json!(package)])
+            .context("failed to submitpackage package")
     }
 
     pub(crate) fn get_transaction_info(

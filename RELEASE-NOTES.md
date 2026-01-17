@@ -1,3 +1,18 @@
+# 0.11.0 (Nov 16 2025)
+
+* Update MSRV to 1.85
+* Support Debian 13 (trixie) / Ubuntu 25.04 (plucky)
+* Update RocksDB crate to `rust-rocksdb` 0.36
+  - [Dynamic linking with RocksDB](doc/install.md) now requires [RocksDB 9.10.0](https://packages.debian.org/trixie/librocksdb-dev) (instead of 7.8.3).
+  - Old electrs versions won't be able to read the new RocksDB database format (requiring reindex).
+* Support `blockchain.transaction.broadcast_package` Electrum RPC.
+* Update dependencies (`bitcoin`, `ctrlc`, `log`, `prometheus`, `rayon`, `serde`, `serde_json`, `tempfile`, `tempfile`).
+
+# 0.10.10 (Jul 19 2025)
+
+* Update documentation links and typos.
+* Update dependencies (`bitcoin`, `crossbeam-channel`, `log`, `prometheus`, `signal-hook`, `tempfile`).
+
 # 0.10.9 (Feb 01 2025)
 
 * Update `bitcoin_slices` to 0.10.0
@@ -249,7 +264,7 @@ Full list of changes:
 
 * Fix JSONRPC errors' handling (#398, #390)
 * Optimize Dockerfile (#387, #388, #392)
-* Fix signet default port (https://github.com/romanz/electrs/b53178c140e575b0527a70ead566d50c7fe6cb1f)
+* Fix signet default port (https://github.com/romanz/electrs/commit/b53178c140e575b0527a70ead566d50c7fe6cb1f)
 
 # 0.8.9 (19 Mar 2021)
 

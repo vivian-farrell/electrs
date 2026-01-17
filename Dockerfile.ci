@@ -2,13 +2,13 @@
 # The maintainers of electrs are not deeply familiar with Docker, so you should DYOR.
 # If you are not familiar with Docker either it's probably be safer to NOT use it.
 
-FROM debian:bookworm-slim as base
+FROM debian:trixie-slim AS base
 RUN apt-get update -qqy
 RUN apt-get install -qqy librocksdb-dev wget
 
 ### Electrum Rust Server ###
-FROM base as electrs-build
-RUN apt-get install -qqy cargo clang cmake
+FROM base AS electrs-build
+RUN apt-get install -qqy cargo build-essential libclang-dev
 
 # Install electrs
 WORKDIR /build/electrs
@@ -18,7 +18,7 @@ ENV ROCKSDB_LIB_DIR=/usr/lib
 RUN cargo install --locked --path .
 
 ### Bitcoin Core ###
-FROM base as bitcoin-build
+FROM base AS bitcoin-build
 # Download
 WORKDIR /build/bitcoin
 ARG ARCH=x86_64
@@ -28,7 +28,7 @@ RUN tar xvf bitcoin-$BITCOIND_VERSION-$ARCH-linux-gnu.tar.gz
 RUN mv -v bitcoin-$BITCOIND_VERSION/bin/bitcoind .
 RUN mv -v bitcoin-$BITCOIND_VERSION/bin/bitcoin-cli .
 
-FROM base as result
+FROM base AS result
 # Copy the binaries
 COPY --from=electrs-build /root/.cargo/bin/electrs /usr/bin/electrs
 COPY --from=bitcoin-build /build/bitcoin/bitcoind /build/bitcoin/bitcoin-cli /usr/bin/
@@ -37,7 +37,7 @@ RUN bitcoind -version && bitcoin-cli -version
 ### Electrum ###
 # Clone latest Electrum wallet and a few test tools
 WORKDIR /build/
-RUN apt-get install -qqy git libsecp256k1-1 python3-cryptography python3-setuptools python3-venv python3-pip jq curl
+RUN apt-get install -qqy git libsecp256k1-2 python3-cryptography python3-setuptools python3-venv python3-pip jq curl
 RUN git clone --recurse-submodules https://github.com/spesmilo/electrum/ && cd electrum/ && git log -1
 RUN python3 -m venv --system-site-packages venv && \
     ELECTRUM_ECC_DONT_COMPILE=1 venv/bin/pip install -e electrum/ && \
