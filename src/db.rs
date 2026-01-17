@@ -107,12 +107,12 @@ fn default_opts(parallelism: u8) -> rocksdb::Options {
     opts.set_max_subcompactions(parallelism.into());
 
     opts.set_keep_log_file_num(10);
-    opts.set_max_open_files(5000); // Conservative limit for client query safety
+    opts.set_max_open_files(16);
     opts.set_compaction_style(rocksdb::DBCompactionStyle::Level);
     opts.set_compression_type(rocksdb::DBCompressionType::Zstd);
     opts.set_target_file_size_base(256 << 20);
     opts.set_write_buffer_size(256 << 20);
-    opts.set_disable_auto_compactions(true); // for initial bulk load
+    opts.set_disable_auto_compactions(false); // for initial bulk load
     opts.set_advise_random_on_open(false); // bulk load uses sequential I/O
     opts.set_prefix_extractor(rocksdb::SliceTransform::create_fixed_prefix(8));
     opts.set_block_based_table_factory(&block_opts);
