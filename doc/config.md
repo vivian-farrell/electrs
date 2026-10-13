@@ -5,11 +5,12 @@ If you use automated systems, refer to their documentation first!
 
 ### Bitcoind configuration
 
-Pruning must be turned **off** for `electrs` to work.
+REST API must be **enabled** for block indexing and transaction lookup (`-rest=1`).
+
+Pruning must be **disabled** for `electrs` to work (`-prune=0`).
+
 `txindex` is allowed but unnecessary for `electrs`.
 However, you might still need it if you run other services (e.g.`eclair`).
-The option `maxconnections` (if used) should be set to 12 or more for bitcoind to accept inbound p2p connections.
-Note that setting `maxuploadtarget` may cause p2p-based sync to fail - so consider using `-whitelist=download@127.0.0.1` to disable the limit for local p2p connections.
 
 The highly recommended way of authenticating `electrs` is using cookie file.
 It's the most [secure](https://github.com/Kixunil/security_writings/blob/master/cookie_files.md) and robust method.
@@ -21,7 +22,7 @@ You can skip it if you're running both daemons under the same user and with the 
 Example command for running `bitcoind` (assuming same user, default dirs):
 
 ```bash
-$ bitcoind -server=1 -txindex=0 -prune=0
+$ bitcoind -server=1 -rest=1 -txindex=0 -prune=0
 ```
 ### Electrs configuration
 
@@ -139,7 +140,7 @@ HiddenServiceVersion 3
 HiddenServicePort 50001 127.0.0.1:50001
 ```
 
-If you use [the *beta* Debian repository](binaries.md#cnative-os-packages),
+If you use [the *beta* Debian repository](binaries.md#native-os-packages),
 it is cleaner to install `tor-hs-patch-config` using `apt` and then placing the configuration into a file inside `/etc/tor/hidden-services.d`.
 
 Restart the service:
@@ -162,7 +163,7 @@ For more details, see http://docs.electrum.org/en/latest/tor.html.
 
 ### Sample Systemd Unit File
 
-If you use [the *beta* Debian repository](binaries.md#cnative-os-packages), you should skip this section,
+If you use [the *beta* Debian repository](binaries.md#native-os-packages), you should skip this section,
 as the appropriate systemd unit file is installed automatically.
 
 You may wish to have systemd manage electrs so that it's "always on".

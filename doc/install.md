@@ -1,20 +1,13 @@
 ## Quickstart
 
-<details>
-<summary>Building from source on an Ubuntu 25.04 / Debian 13:</summary>
+Building from source on an Ubuntu 25.04 / Debian 13:
 
 ```bash
 $ sudo apt update
 $ sudo apt install -y build-essential libclang-dev git cargo
-$ git clone https://github.com/romanz/electrs
-$ cd electrs
-$ cargo build --locked --release
-$ ./target/release/electrs --version  # should print the latest version
+$ git clone https://github.com/romanz/electrs && cd electrs
+$ cargo run --locked --release -- --version  # build and print the latest version
 ```
-
-</details>
-
-[![asciicast](https://asciinema.org/a/XKznxilP4O7lCZiVZ9vZNd5vx.svg)](https://asciinema.org/a/XKznxilP4O7lCZiVZ9vZNd5vx?speed=3)
 
 ## Manual installation from source
 
@@ -26,7 +19,7 @@ Note for Raspberry Pi 4 owners: the old versions of OS/toolchains produce broken
 Make sure to use latest OS! (see #226)
 
 Install [recent Rust](https://rustup.rs/) (1.85.0+, `apt install cargo` is preferred for Debian 13),
-[latest Bitcoin Core](https://bitcoincore.org/en/download/) (0.21+)
+[latest Bitcoin Core](https://bitcoincore.org/en/download/) (31.0+)
 and [latest Electrum wallet](https://electrum.org/#download) (4.0+).
 
 Also, install the following packages (on Debian or Ubuntu):

@@ -1,3 +1,17 @@
+# 0.12.0 (Sep 13 2026)
+
+* Switch to `bindex`: requires Bitcoin Core 31+ and rebuilding the index.
+* Fix `server.features` response format.
+* Update `transaction.id_from_pos` argument parsing for API compliance.
+* Add `SECURITY.md`.
+* Update dependencies (`bitcoin`, `bitcoin_slices`, `bytes`, `crossbeam-channel`, `ctrlc`, `log`, `rayon`, `serde_json`, `signal-hook`, `tempfile`).
+
+# 0.11.1 (Feb 22 2026)
+
+* Update `transaction.id_from_pos` response for API compliance.
+* Expose configurable magic on non-signet.
+* Update dependencies (`bitcoin`, `ctrlc`, `log`, `serde_json`, `signal-hook`, `tempfile`).
+
 # 0.11.0 (Nov 16 2025)
 
 * Update MSRV to 1.85
