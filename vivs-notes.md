@@ -49,7 +49,7 @@ Troubleshooting
   sudo sysctl -w net.inet.tcp.msl=1000
   sudo sysctl -w net.inet.ip.portrange.first=10000
   ```
-- Upgrading to 0.12 (Oct 2026) required a full reindex (~10h). Old index format is not compatible.
+- Upgrading to 0.12 (Oct 2026) required a full reindex (several hours). Old index format is not compatible.
 
 Old Docker setup (pre-0.12, no longer used)
 - run.sh used to start the electrs docker container (`--network host`, Docker Desktop 'Enable host networking' enabled); from within the container bitcoind is at `host.docker.internal` if that setting is off.
